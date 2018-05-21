@@ -1,0 +1,74 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:DIARY_V4">
+
+    <Color x:Key="TextButtonMouseOver">#FF0000</Color>
+    <SolidColorBrush x:Key="TextButtonMouseOverBrush" Color="{StaticResource TextButtonMouseOver}" />
+
+    <Color x:Key="TextButtonLight">#fff</Color>
+    <SolidColorBrush x:Key="TextButtonLightBrush" Color="{StaticResource TextButtonLight}" />
+
+    <Color x:Key="TextButtonDark">#000</Color>
+    <SolidColorBrush x:Key="TextButtonDarkBrush" Color="{StaticResource TextButtonDark}" />
+
+    <Color x:Key="ButtonOrange">#FF7400</Color>
+    <SolidColorBrush x:Key="ButtonOrangeBrush" Color="{StaticResource ButtonOrange}" />
+
+    <Color x:Key="ButtonGreen">#00c541</Color>
+    <SolidColorBrush x:Key="ButtonGreenBrush" Color="{StaticResource ButtonGreen}" />
+
+    <Color x:Key="BackgroundGrid">#FFD59E</Color>
+    <SolidColorBrush x:Key="BackgroundGridBrush" Color="{StaticResource BackgroundGrid}" />
+
+    <Color x:Key="ButtonForeground">#fff</Color>
+    <SolidColorBrush x:Key="ButtonForegroundBrush" Color="{StaticResource ButtonForeground}" />
+
+    <Color x:Key="DiaryOrange">#FF6700</Color>
+    <SolidColorBrush x:Key="DiaryOrangeBrush" Color="{StaticResource DiaryOrange}" />
+
+    <Color x:Key="DiaryLightOrange">#FF8D40</Color>
+    <SolidColorBrush x:Key="DiaryLightOrangeBrush" Color="{StaticResource DiaryLightOrange}" />
+
+    <Color x:Key="ForegroundLigth">#ffffff</Color>
+    <SolidColorBrush x:Key="ForegroundLigthBrush" Color="{StaticResource ForegroundLigth}" />
+
+    <Color x:Key="ForegroundMain">#686868</Color>
+    <SolidColorBrush x:Key="ForeGroundMainBrush" Color="{StaticResource ForegroundMain}" />
+
+    <Color x:Key="CloseButtonDefault">#bababa</Color>
+    <SolidColorBrush x:Key="CloseButtonDefaultBrush" Color="{StaticResource CloseButtonDefault}" />
+
+    <Color x:Key="BackgroundButton">#efefef</Color>
+    <SolidColorBrush x:Key="BackgroundButtonBrush" Color="{StaticResource BackgroundButton}" />
+
+    
+    
+    
+    <Color x:Key="BackgroundOrange">#FF7C00</Color>
+    <SolidColorBrush x:Key="BackgroundOrangeBrush" Color="{StaticResource BackgroundOrange}" />
+
+    <Color x:Key="BackgroundLightOrange">#FF9D40</Color>
+    <SolidColorBrush x:Key="BackgroundLightOrangeBrush" Color="{StaticResource BackgroundLightOrange}" />
+
+    <Color x:Key="BackgroundVeryLigthOrange">#FFB773</Color>
+    <SolidColorBrush x:Key="BackgroundVeryLightOrangeBrush" Color="{StaticResource BackgroundVeryLightOrange}" />
+
+    <Color x:Key="BackgroundBrown">#A65100</Color>
+    <SolidColorBrush x:Key="BackgroundBrownBrush" Color="{StaticResource BackgroundBrown}" />
+
+    <Color x:Key="BackgroundLightBrown">#BF7630</Color>
+    <SolidColorBrush x:Key="BackgroundLigthBrownBrush" Color="{StaticResource BackgroundLightBrown}" />
+
+    <Color x:Key="BackgroundVeryLightBrown">#E7C697</Color>
+    <SolidColorBrush x:Key="BackgroundVeryLigthBrownBrush" Color="{StaticResource BackgroundVeryLightBrown}" />
+
+    <Color x:Key="BackgroundVeryLightGreen">#60D4AE</Color>
+    <SolidColorBrush x:Key="BackgroundVeryLigthGreenBrush" Color="{StaticResource BackgroundVeryLightGreen}" />
+
+    <Color x:Key="BackgroundVeryLightGrey">#bdbebf</Color>
+    <SolidColorBrush x:Key="BackgroundVeryLigthGreyBrush" Color="{StaticResource BackgroundVeryLightGrey}" />
+
+    <Color x:Key="BackgroundBlue">#3AAACF</Color>
+    <SolidColorBrush x:Key="BackgroundBlueBrush" Color="{StaticResource BackgroundBlue}" />
+
+</ResourceDictionary>

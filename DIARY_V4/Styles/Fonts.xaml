@@ -1,0 +1,8 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:DIARY_V4.Styles">
+
+    <FontFamily x:Key="PackardModern">pack://application;,,,/Fonts/#Packard Modern</FontFamily>
+    <FontFamily x:Key="Brusher">pack://application;,,,/Fonts/#Brusher</FontFamily>
+
+</ResourceDictionary>
