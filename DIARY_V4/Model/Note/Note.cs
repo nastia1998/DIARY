@@ -15,9 +15,6 @@ namespace DIARY_V4.Model
 
         public int Id_User { get; set; }
 
-        //[MaxLength(15)]
-        //public string Date { get; set; }
-
         public DateTime Date { get; set; }
 
         public string Text { get; set; }

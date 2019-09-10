@@ -1,5 +1,6 @@
 ﻿using DIARY_V4.Model;
 using System;
+using System.Linq;
 using System.Windows;
 
 namespace DIARY_V4
@@ -20,29 +21,47 @@ namespace DIARY_V4
             {
                 var dbContext = new BaseDbContext();
                 var unitOfWork = new UnitOfWork(dbContext);
-
-                if(RegisterFloatingPasswordBox1.Password.ToString() == RegisterFloatingPasswordBox2.Password.ToString())
+                if (NameTextBox.Text != "" && RegisterLoginTextBox.Text != "" && RegisterFloatingPasswordBox1.Password != "" && RegisterFloatingPasswordBox2.Password != "" && RegisterSecretWordTextBox.Text != "")
                 {
-                    var user = new User() { Name = NameTextBox.Text, Login = RegisterLoginTextBox.Text, Password = RegisterFloatingPasswordBox1.Password.ToString(), SecretWord = RegisterSecretWordTextBox.Text };
+                    if (RegisterFloatingPasswordBox1.Password == RegisterFloatingPasswordBox2.Password)
+                    {
+                        var userRepeate = unitOfWork.UserRepository.Entities
+                                    .FirstOrDefault(b => b.Login == RegisterLoginTextBox.Text);
+                        var secrwRepeate = unitOfWork.UserRepository.Entities
+                                    .FirstOrDefault(n => n.SecretWord == RegisterSecretWordTextBox.Text);
+                        if (userRepeate == null)
+                        {
+                            if (secrwRepeate == null)
+                            {
+                                var user = new User() { Name = NameTextBox.Text, Login = RegisterLoginTextBox.Text, Password = RegisterFloatingPasswordBox1.Password, SecretWord = RegisterSecretWordTextBox.Text };
 
-                    unitOfWork.UserRepository.Add(user);
-                    unitOfWork.Commit();
+                                unitOfWork.UserRepository.Add(user);
+                                unitOfWork.Commit();
 
-                    //var users = unitOfWork.UserRepository.Entities;
-                    //foreach(var u in users)
-                    //{
-                    //    MessageBox.Show(u.Login + u.Name  + "\n");
-                    //}
-                    
-                    MessageBox.Show("Пользователь добавлен");
+                                MessageBox.Show("Регистрация прошла успешно");
 
-                    LoginWindow loginWindow = new LoginWindow();
-                    loginWindow.Show();
-                    this.Close();
+                                LoginWindow loginWindow = new LoginWindow();
+                                loginWindow.Show();
+                                this.Close();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Придумайте другое секретное слово!", "Новое секретное слово", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Пользователь с таким логином уже существует!\nИспользуйте другой логин.", "Повторение логина", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Пароли в полях должны совпадать");
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Пароли в полях должны совпадать");
+                    MessageBox.Show("Все поля должны быть заполнены", "Пустые поля", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch(Exception ex)

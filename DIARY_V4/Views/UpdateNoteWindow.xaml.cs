@@ -84,7 +84,7 @@ namespace DIARY_V4
             ShowAtts showAtts = new ShowAtts();
             showAtts.Login = Login;
             showAtts.Owner = this;
-            showAtts.VRow = VRow;
+            showAtts.VRow = VRow; // Дата
             showAtts.ShowDialog();
         }
     }

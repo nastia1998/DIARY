@@ -27,9 +27,6 @@ namespace DIARY_V4
         public MainWindow()
         {
             InitializeComponent();
-
-            //Canvas.AddHandler(RichTextBox.DragOverEvent, new DragEventHandler(DragImage), true);
-            //Canvas.AddHandler(RichTextBox.DropEvent, new DragEventHandler(DropImage), true);
         }
 
        
@@ -51,10 +48,6 @@ namespace DIARY_V4
             var user = unitOfWork.UserRepository.Entities
                         .FirstOrDefault(b => b.Login == Login);
 
-            //string thisDay = DateTime.Today.ToShortDateString();
-            //string day = thisDay.Date.ToString("yyyy-MM-dd");
-            //DateTime curDate = DateTime.Now.Date;
-            //string thisDate = curDate.Date.ToString("yyyy-MM-dd");
             DateTime curDate = DateTime.Today.Date;
 
             var reminders = unitOfWork.ReminderRepository.Entities
@@ -72,15 +65,6 @@ namespace DIARY_V4
         }
 
         #region Меню
-
-        private void ButtonPopUpLogOut_Click(object sender, RoutedEventArgs e)
-        {
-            //Application.Current.Shutdown();
-            //Login login = new Login();
-            //login.Show();
-            //this.Close();
-
-        }
 
         private void ButtonOpenMenu_Click(object sender, RoutedEventArgs e)
         {
@@ -106,50 +90,75 @@ namespace DIARY_V4
 
         private void AllNotesDG_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            UpdateNotesDataGrid();
+            UpdateNote();
         }
 
         private void SaveNoteButton_Click(object sender, RoutedEventArgs e)
         {
             try
-            { 
-                var dbContext = new BaseDbContext();
-                var unitOfWork = new UnitOfWork(dbContext);
-
-                var user = unitOfWork.UserRepository.Entities
-                            .FirstOrDefault(n => n.Login == Login);
-
-                
-
-                string date = Convert.ToDateTime(DateNote.Text).ToString("yyyy-MM-dd");
-                DateTime selDate = Convert.ToDateTime(DateNote.Text);
-
-                var Olddate = unitOfWork.NoteRepository.Entities
-                            .FirstOrDefault(b => (b.User.Login == Login) && (b.Date == selDate));
-
+            {
                 string rtbText = new TextRange(NoteRichTextBox.Document.ContentStart, NoteRichTextBox.Document.ContentEnd).Text; //string to save to db
+                TextRange textRange = new TextRange(NoteRichTextBox.Document.ContentStart, NoteRichTextBox.Document.ContentEnd);
+                var text = textRange.Text;
 
-                if (Olddate != null)
+                if (text.Length < 4000)
                 {
-                    Olddate.Text = Olddate.Text + "------------------------------------------------------------------------\n" + rtbText;
-                    unitOfWork.Commit();
+                    if (rtbText != "\r\n")
+                    {
+                        var dbContext = new BaseDbContext();
+                        var unitOfWork = new UnitOfWork(dbContext);
+
+                        var user = unitOfWork.UserRepository.Entities
+                                    .FirstOrDefault(n => n.Login == Login);
+
+                        string date = Convert.ToDateTime(DateNote.Text).ToString("yyyy-MM-dd");
+                        DateTime selDate = Convert.ToDateTime(DateNote.Text);
+
+                        var Oldnote = unitOfWork.NoteRepository.Entities
+                                    .FirstOrDefault(b => (b.User.Login == Login) && (b.Date == selDate));
+
+
+                        if (Oldnote != null)
+                        {
+                            Oldnote.Text = Oldnote.Text + "------------------------------------------------------------------------\n" + rtbText;
+                            var res = MessageBox.Show("Заметка на данную дату уже была создана. Дополнить ее?", "Дополнение заметки", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                            if (res == MessageBoxResult.Yes)
+                            {
+                                unitOfWork.Commit();
+                            }
+                        }
+                        else
+                        {
+                            var note = new Note() { Date = Convert.ToDateTime(date), Id_User = user.Id, Text = rtbText };
+                            unitOfWork.NoteRepository.Add(note);
+                            unitOfWork.Commit();
+                            for (int i = 0; i < a; i++)
+                            {
+                                var attPhoto = new AttPhoto { Path = Locations[i], Id_Note = note.Id_Note };
+                                unitOfWork.PhotosRepository.Add(attPhoto);
+                                unitOfWork.Commit();                                
+                            }
+                            a = 0; // чтобы можно было добавить фотографии к заметке на другой день сразу после добавления на текущий
+                            Locations.Clear();
+                            firstImg.Source = null;
+                            secImg.Source = null;
+                            thirdImg.Source = null;
+                            firstImg.IsEnabled = true;
+                            secImg.IsEnabled = true;
+                            thirdImg.IsEnabled = true;
+                            MessageBox.Show("Добавлена новая заметка");
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Не было введено текста");
+                    }
                 }
                 else
                 {
-
-                    var note = new Note() { Date = Convert.ToDateTime(date), Id_User = user.Id, Text = rtbText };
-                    unitOfWork.NoteRepository.Add(note);
-                    unitOfWork.Commit();
-                    for (int i = 0; i < a; i++)
-                    {
-                        var attPhoto = new AttPhoto { Path = Locations[i], Id_Note = note.Id_Note };
-                        unitOfWork.PhotosRepository.Add(attPhoto);
-                        unitOfWork.Commit();
-                    }
-
+                    MessageBox.Show("Было введено слишком много символов!", "Превышение количества символов", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 }
-
-                MessageBox.Show("Добавлена новая заметка");
+               
 
             }
             catch(Exception ex)
@@ -160,10 +169,10 @@ namespace DIARY_V4
 
         private void UpdateNoteBtn_Click(object sender, RoutedEventArgs e)
         {
-            UpdateNotesDataGrid();
+            UpdateNote();
         }
 
-        private void UpdateNotesDataGrid()
+        private void UpdateNote()
         {
             try
             {
@@ -197,22 +206,33 @@ namespace DIARY_V4
         {
             try
             {
-                var dbContext = new BaseDbContext();
-                UnitOfWork unitOfWork = new UnitOfWork(dbContext);
-
                 int row = AllNotesDG.SelectedIndex;
-                var ci = new DataGridCellInfo(AllNotesDG.Items[row], AllNotesDG.Columns[0]);
-                var crow = ci.Column.GetCellContent(ci.Item) as TextBlock;
-                var vrow = crow.Text;
-                string date = Convert.ToDateTime(vrow).ToString("yyyy-MM-dd");
-                DateTime Date = Convert.ToDateTime(date);
 
-                var note = unitOfWork.NoteRepository.Entities
-                        .FirstOrDefault(p => p.Date == Date);
-                unitOfWork.NoteRepository.Remove(note);
-                unitOfWork.Commit();
-                MessageBox.Show("Заметка успешно удалена");
-                UpdateNotesDG();
+                if (row != -1)
+                {
+                    var res = MessageBox.Show("Вы уверены, что хотите удалить заметку?\nВосстановление невозможно", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (res == MessageBoxResult.Yes)
+                    {
+                        var dbContext = new BaseDbContext();
+                        UnitOfWork unitOfWork = new UnitOfWork(dbContext);
+
+                        var ci = new DataGridCellInfo(AllNotesDG.Items[row], AllNotesDG.Columns[0]);
+                        var crow = ci.Column.GetCellContent(ci.Item) as TextBlock;
+                        var vrow = crow.Text;
+                        string date = Convert.ToDateTime(vrow).ToString("yyyy-MM-dd");
+                        DateTime Date = Convert.ToDateTime(date);
+
+                        var note = unitOfWork.NoteRepository.Entities
+                                .FirstOrDefault(p => p.Date == Date);
+                        unitOfWork.NoteRepository.Remove(note);
+                        unitOfWork.Commit();
+                        UpdateNotesDG();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Для удаления необходимо выбрать запись");
+                }
 
 
             }
@@ -236,9 +256,10 @@ namespace DIARY_V4
         {
             var dbContext = new BaseDbContext();
             var unitOfWork = new UnitOfWork(dbContext);
-
+           
             var notes = unitOfWork.NoteRepository.Entities
                         .Where(n => n.User.Login == Login).ToList();
+
             AllNotesDG.ItemsSource = notes;
         }
 
@@ -264,15 +285,15 @@ namespace DIARY_V4
 
         private void UpdContactBtn_Click(object sender, RoutedEventArgs e)
         {           
-            UpdateContactsDataGrid();
+            UpdateContact();
         }
 
-        private void ContactsDG_MouseDown(object sender, MouseButtonEventArgs e)
+        private void ContactsDG_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            UpdateContactsDataGrid();
+            UpdateContact();
         }
 
-        private void UpdateContactsDataGrid()
+        private void UpdateContact()
         {
             try
             {
@@ -306,20 +327,31 @@ namespace DIARY_V4
         {
             try
             {
-                var dbContext = new BaseDbContext();
-                UnitOfWork unitOfWork = new UnitOfWork(dbContext);
-
                 int row = ContactsDG.SelectedIndex;
-                var ci = new DataGridCellInfo(ContactsDG.Items[row], ContactsDG.Columns[0]);
-                var crow = ci.Column.GetCellContent(ci.Item) as TextBlock;
-                int vrow = Convert.ToInt32(crow.Text);
 
-                var contact = unitOfWork.ContactRepository.Entities
-                        .FirstOrDefault(p => p.Id_Contact == vrow);
-                unitOfWork.ContactRepository.Remove(contact);
-                unitOfWork.Commit();
-                MessageBox.Show("Контакт успешно удалён");
-                UpdateContactsDG();
+                if (row != -1)
+                {
+                    var res = MessageBox.Show("Вы уверены, что хотите удалить Контакт?\nВосстановление невозможно", "Удаление контакта", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (res == MessageBoxResult.Yes)
+                    {
+                        var dbContext = new BaseDbContext();
+                        UnitOfWork unitOfWork = new UnitOfWork(dbContext);
+
+                        var ci = new DataGridCellInfo(ContactsDG.Items[row], ContactsDG.Columns[0]);
+                        var crow = ci.Column.GetCellContent(ci.Item) as TextBlock;
+                        int vrow = Convert.ToInt32(crow.Text);
+
+                        var contact = unitOfWork.ContactRepository.Entities
+                                .FirstOrDefault(p => p.Id_Contact == vrow);
+                        unitOfWork.ContactRepository.Remove(contact);
+                        unitOfWork.Commit();
+                        UpdateContactsDG();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Для удаления необходимо выбрать запись");
+                }
 
             }
             catch (Exception ex)
@@ -332,6 +364,7 @@ namespace DIARY_V4
         {
             var dbContext = new BaseDbContext();
             var unitOfWork = new UnitOfWork(dbContext);
+
             var contacts = unitOfWork.ContactRepository.Entities
                         .Where(n => n.User.Login == Login)             
                         .ToList();
@@ -353,7 +386,7 @@ namespace DIARY_V4
 
         private void RemindersDataGrid_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            UpdateRemindersDataGrid();
+            UpdateReminder();
         }
 
         private void AddReminderBtn_Click(object sender, RoutedEventArgs e)
@@ -367,10 +400,10 @@ namespace DIARY_V4
 
         private void UpdReminderBtn_Click(object sender, RoutedEventArgs e)
         {
-            UpdateRemindersDataGrid();
+            UpdateReminder();
         }
 
-        private void UpdateRemindersDataGrid()
+        private void UpdateReminder()
         {
             try
             {
@@ -391,7 +424,7 @@ namespace DIARY_V4
                     reminderWindow.VRow = cvrow;
                     reminderWindow.Owner = this;
                     reminderWindow.ShowDialog();
-                    UpdateContactsDG();
+                    UpdateRemindersDG();
                 }
 
             }
@@ -409,18 +442,21 @@ namespace DIARY_V4
                 UnitOfWork unitOfWork = new UnitOfWork(dbContext);
 
                 int row = RemindersDataGrid.SelectedIndex;
-                var ci = new DataGridCellInfo(RemindersDataGrid.Items[row], RemindersDataGrid.Columns[0]);
-                var crow = ci.Column.GetCellContent(ci.Item) as TextBlock;
-                string vrow = crow.Text;
-                DateTime cvrow = Convert.ToDateTime(vrow);
 
-                var reminder = unitOfWork.ReminderRepository.Entities
-                        .FirstOrDefault(p => p.Date == cvrow);
-                unitOfWork.ReminderRepository.Remove(reminder);
-                unitOfWork.Commit();
-                MessageBox.Show("Напоминание успешно удалено");
-                UpdateRemindersDG();
+                if (row != -1)
+                {
+                    var ci = new DataGridCellInfo(RemindersDataGrid.Items[row], RemindersDataGrid.Columns[0]);
+                    var crow = ci.Column.GetCellContent(ci.Item) as TextBlock;
+                    string vrow = crow.Text;
+                    DateTime cvrow = Convert.ToDateTime(vrow);
 
+                    var reminder = unitOfWork.ReminderRepository.Entities
+                            .FirstOrDefault(p => p.Date == cvrow);
+                    unitOfWork.ReminderRepository.Remove(reminder);
+                    unitOfWork.Commit();
+                    MessageBox.Show("Напоминание успешно удалено");
+                    UpdateRemindersDG();
+                }
             }
             catch (Exception ex)
             {
@@ -451,80 +487,65 @@ namespace DIARY_V4
             OpenGrid.Visibility = Visibility.Collapsed;
         }
 
-        private void Note_MouseEnter(object sender, MouseEventArgs e)
-        {
-            var dbContext = new BaseDbContext();
-            var unitOfWork = new UnitOfWork(dbContext);
-
-            var notes = unitOfWork.NoteRepository.Entities
-                        .Where(n => n.User.Login == Login);
-        }
-
-        //private void Canvas_Drop(object sender, DragEventArgs e)
-        //{
-        //    foreach (var format in e.Data.GetFormats())
-        //    {
-        //        ImageSource imageSource = e.Data.GetData(format) as ImageSource;
-        //        if (imageSource != null)
-        //        {
-        //            System.Windows.Controls.Image img = new System.Windows.Controls.Image();
-        //            img.Height = 100;
-        //            img.Source = imageSource;
-        //            ((Canvas)sender).Children.Add(img);
-        //        }
-        //    }
-        //}
-
-
         static int a = 0;
-        static string img1Location = "";
-        static string img2Location = "";
-        static string img3Location = "";
+        string img1Location = "";
+        string img2Location = "";
+        string img3Location = "";
         List<string> Locations = new List<string>();
         BitmapImage bitmap1;
         private void addPhotoButton_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog op = new OpenFileDialog();
-            op.Title = "Select a picture";
-            op.Filter = "All supported graphics|*.jpg;*.jpeg;*.png|" +
-              "JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|" +
-              "Portable Network Graphic (*.png)|*.png";
-            if (op.ShowDialog() == true)
+            var dbContext = new BaseDbContext();
+            var unitOfWork = new UnitOfWork(dbContext);
+
+            var photos = unitOfWork.PhotosRepository.Entities
+                    .Where(b => (b.Note.Date == DateNote.SelectedDate) && (b.Note.User.Login == Login)).ToList();
+            if (photos.Count == 0)
             {
-                if (firstImg.IsEnabled == true)
+                OpenFileDialog op = new OpenFileDialog();
+                op.Title = "Select a picture";
+                op.Filter = "All supported graphics|*.jpg;*.jpeg;*.png|" +
+                  "JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|" +
+                  "Portable Network Graphic (*.png)|*.png";
+                if (op.ShowDialog() == true)
                 {
-                    bitmap1 = new BitmapImage(new Uri(op.FileName));
-                    firstImg.Source = bitmap1;
-                    a++;
-                    //Photo.Source = new BitmapImage(new Uri(op.FileName));
-                    img1Location = op.FileName.ToString();
-                    Locations.Add(img1Location);
-                    firstImg.IsEnabled = false;
-                }
-                else if (secImg.IsEnabled == true)
-                {
-                    bitmap1 = new BitmapImage(new Uri(op.FileName));
-                    secImg.Source = bitmap1;
-                    a++;
-                    img2Location = op.FileName.ToString();
-                    Locations.Add(img2Location);
-                    secImg.IsEnabled = false;
-                }
-                else if (thirdImg.IsEnabled == true)
-                {
-                    bitmap1 = new BitmapImage(new Uri(op.FileName));
-                    thirdImg.Source = bitmap1;
-                    a++;
-                    img3Location = op.FileName.ToString();
-                    Locations.Add(img3Location);
-                    thirdImg.IsEnabled = false;
-                }
-                else
-                {
-                    MessageBox.Show("Можно добавить только 3 картинки");
+                    if (firstImg.IsEnabled == true)
+                    {
+                        bitmap1 = new BitmapImage(new Uri(op.FileName));                        
+                        firstImg.Source = bitmap1;
+                        a++;
+                        img1Location = op.FileName.ToString();
+                        Locations.Add(img1Location);
+                        firstImg.IsEnabled = false;
+                    }
+                    else if (secImg.IsEnabled == true)
+                    {
+                        bitmap1 = new BitmapImage(new Uri(op.FileName));
+                        secImg.Source = bitmap1;
+                        a++;
+                        img2Location = op.FileName.ToString();
+                        Locations.Add(img2Location);
+                        secImg.IsEnabled = false;
+                    }
+                    else if (thirdImg.IsEnabled == true)
+                    {
+                        bitmap1 = new BitmapImage(new Uri(op.FileName));
+                        thirdImg.Source = bitmap1;
+                        a++;
+                        img3Location = op.FileName.ToString();
+                        Locations.Add(img3Location);
+                        thirdImg.IsEnabled = false;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Можно добавить только 3 картинки");
+                    }
                 }
             }
+            else
+            {
+                MessageBox.Show("Фотографии к данной заметке уже есть");
+            }
         }
-
     }
 }

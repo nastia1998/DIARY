@@ -9,7 +9,7 @@
         WindowStartupLocation="CenterScreen"
         Loaded="UpdateNoteWindow_Loaded"
         ResizeMode="NoResize"
-        Icon="/Images/Logo/Diary-icon.png"
+        Icon="/Images/Logo/notebook.ico"
         Title="Просмотр записи" Height="300" Width="300">
     <Grid>
         <Grid.RowDefinitions>

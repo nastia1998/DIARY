@@ -7,31 +7,33 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         WindowStyle="SingleBorderWindow"
-        Icon="/Images/Logo/Colorful-Diary.ico"
+        Icon="/Images/Logo/notebook.ico"
         WindowStartupLocation="CenterScreen"
         Title="Вход" Height="300" Width="300" ResizeMode="NoResize" >
 
     <Grid>
-        
-            <materialDesign:Card  Width="200" VerticalAlignment="Center" HorizontalAlignment="Center">
 
-                <StackPanel Orientation="Vertical" Margin="10">
+        <materialDesign:Card  Width="274" VerticalAlignment="Center" HorizontalAlignment="Center" Height="251" Margin="20">
+
+            <StackPanel Orientation="Vertical" Margin="20">
 
                 <TextBox x:Name="LoginTextBox" materialDesign:HintAssist.Hint="Логин"
-                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" />               
+                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                         MaxLength="25" />
 
                 <PasswordBox x:Name="LoginFloatingPasswordBox"
                                              materialDesign:HintAssist.Hint="Пароль"
-                                             Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" />
+                                             Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
+                                             MaxLength="24" />
 
-                    <Button x:Name="LoginEnterButton"  Foreground="{StaticResource ButtonForegroundBrush}"  BorderBrush="{x:Null}" Margin="0 10 0 0" Width="70" Height="30" Content="Вход"  Click="LoginEnterButton_Click" RenderTransformOrigin="0.506,0.85" />
-                    <Button x:Name="ForgetPassword_Button" Style="{StaticResource TextButton}"  Content="Забыли пароль?" Click="ForgetPassword_Button_Click" />
-                <Button x:Name="LoginRegisterButton" Foreground="{StaticResource ButtonForegroundBrush}" BorderBrush="{x:Null}" Margin="30,0" Width="120" Height="30" Content="Регистрация" Click="LoginRegisterButton_Click" RenderTransformOrigin="0.496,-0.14" />
+                <Button x:Name="LoginEnterButton" Foreground="{StaticResource ButtonForegroundBrush}"  BorderBrush="{x:Null}" Margin="0 10 0 0" Width="70" Height="30" Content="Вход"  Click="LoginEnterButton_Click" />
+                <Button x:Name="ForgetPassword_Button" Style="{StaticResource TextButton}"  Content="Забыли пароль?" Click="ForgetPassword_Button_Click" />
+                <Button x:Name="LoginRegisterButton" Foreground="{StaticResource ButtonForegroundBrush}" BorderBrush="{x:Null}" Margin="30,0" Width="120" Height="30" Content="Регистрация" Click="LoginRegisterButton_Click" />
 
             </StackPanel>
 
-            </materialDesign:Card>
-   
+        </materialDesign:Card>
+
     </Grid>
 
 </Window>

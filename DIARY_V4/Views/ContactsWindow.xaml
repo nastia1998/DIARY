@@ -29,32 +29,22 @@
                     <StackPanel Orientation="Horizontal">
                         <materialdesign:PackIcon Kind="Phone" VerticalAlignment="Center" Margin="2" />
                         <TextBox x:Name="PhoneTextBox" Padding="1" BorderBrush="{x:Null}"
-                                 materialdesign:HintAssist.Hint="Телефон" FontSize="14" TextChanged="PhoneTextBox_TextChanged" />
+                                 materialdesign:HintAssist.Hint="80291234567" FontSize="14" MaxLength="11" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <materialdesign:PackIcon Kind="Email" VerticalAlignment="Center" Margin="2" />
                         <TextBox x:Name="EmailTextBox" Padding="1"  BorderBrush="{x:Null}"
-                            materialdesign:HintAssist.Hint="Email" FontSize="14" TextChanged="EmailTextBox_TextChanged" />
+                            materialdesign:HintAssist.Hint="Email" FontSize="14" />
                     </StackPanel>
                     <StackPanel Margin="15 1" Orientation="Horizontal">
                         <Button x:Name="photoBtn" Background="{x:Null}" BorderBrush="{x:Null}" Click="photoBtn_Click" >
                             <materialdesign:PackIcon Foreground="Black" Kind="Image" />
                         </Button>
                         <Button x:Name="SaveContactbtn" Background="{StaticResource ButtonGreenBrush}" BorderBrush="{StaticResource ButtonGreenBrush}" Margin="35 20" Content="OK" Click="SaveContactbtn_Click" />
-                        <Button x:Name="DltContactbtn" Margin="20 20" Content="Cancel" Click="DltContactbtn_Click" />
+                        <Button x:Name="CancelContactbtn" Margin="20 20" Content="Cancel" Click="CancelContactbtn_Click" />
                     </StackPanel>
                 </StackPanel>
-                <StackPanel Orientation="Vertical">
-                    <Image x:Name="Photo" Height="180" Width="180" Margin="10" VerticalAlignment="Top"  />
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button x:Name="leftBtn" Background="{x:Null}" BorderBrush="{x:Null}" Click="leftBtn_Click" >
-                            <materialdesign:PackIcon Foreground="Black" Kind="RotateLeft" />
-                        </Button>
-                        <Button x:Name="rightBtn" Background="{x:Null}" BorderBrush="{x:Null}" Click="rightBtn_Click" >
-                            <materialdesign:PackIcon Foreground="Black" Kind="RotateRight" />
-                        </Button>
-                    </StackPanel>
-                </StackPanel>
+                <Image x:Name="Photo" Height="220" Width="180" Margin="10" VerticalAlignment="Top" Source="{Binding Photo}" />
             </StackPanel>
         </Viewbox>
     </materialdesign:Card>

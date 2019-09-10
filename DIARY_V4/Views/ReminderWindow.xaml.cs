@@ -24,8 +24,9 @@ namespace DIARY_V4
         {
             DateTime date = Convert.ToDateTime(VRow);
             bool flag = IsReminderAlreadyExist(date);
-            if(flag)
+            if (flag)
             {
+                DateOfReminder.IsEnabled = false;
                 var dbContext = new BaseDbContext();
                 var unitOfWork = new UnitOfWork(dbContext);
                 var reminder = unitOfWork.ReminderRepository.Entities
@@ -40,46 +41,78 @@ namespace DIARY_V4
         {
             try
             {
-                DateTime date1 = Convert.ToDateTime(VRow);
+                DateTime? date1 = DateOfReminder.SelectedDate;
                 bool flag = IsReminderAlreadyExist(date1);
-                if (flag)
+                string rtbText1 = new TextRange(ReminderRichTextBox.Document.ContentStart, ReminderRichTextBox.Document.ContentEnd).Text; //string to save to db
+                if (TimeTextBox.Text != "" && rtbText1 != "")
                 {
-                    var dbContext = new BaseDbContext();
-                    var unitOfWork = new UnitOfWork(dbContext);
-                    var reminder = unitOfWork.ReminderRepository.Entities
-                                .FirstOrDefault(n => (n.User.Login == Login) && (n.Date == date1));
-                    //reminder.Date = Convert.ToDateTime(DateOfReminder.Text);
-                    reminder.Time = TimeTextBox.Text;
-                    string rtbText = new TextRange(ReminderRichTextBox.Document.ContentStart, ReminderRichTextBox.Document.ContentEnd).Text;
-                    reminder.Text = rtbText;
-                    unitOfWork.Commit();
-                    MessageBox.Show("Изменения успешно сохранены");
+                    if (DateOfReminder.SelectedDate != null)
+                    {
+                        if (rtbText1.Length < 200)
+                        {
+                            if (flag)
+                            {
+                                var dbContext = new BaseDbContext();
+                                var unitOfWork = new UnitOfWork(dbContext);
+                                var reminder = unitOfWork.ReminderRepository.Entities
+                                            .FirstOrDefault(n => (n.User.Login == Login) && (n.Date == date1));
+
+                                if (reminder != null)
+                                {
+                                    if (DateOfReminder.IsEnabled == false) //если окно открыто для изменений
+                                    {
+                                        reminder.Text = rtbText1;
+                                        reminder.Time = TimeTextBox.Text;
+                                        unitOfWork.Commit();
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show("Напоминание на данный день уже было записано.\n Для его изменения перейдите в напоминание");
+                                    }
+                                }
+                            }
+
+                            else
+                            {
+                                string date = Convert.ToDateTime(DateOfReminder.Text).ToString("yyyy-MM-dd");
+                                var dbContext = new BaseDbContext();
+                                var unitOfWork = new UnitOfWork(dbContext);
+
+                                var user = unitOfWork.UserRepository.Entities
+                                          .FirstOrDefault(n => n.Login == Login);
+
+
+                                string rtbText = new TextRange(ReminderRichTextBox.Document.ContentStart, ReminderRichTextBox.Document.ContentEnd).Text;
+
+                                var reminder = new Reminder()
+                                {
+                                    Date = Convert.ToDateTime(date),
+                                    Time = TimeTextBox.Text,
+                                    Text = rtbText,
+                                    Id_User = user.Id
+                                };
+
+                                unitOfWork.ReminderRepository.Add(reminder);
+                                unitOfWork.Commit();
+                                MessageBox.Show("Добавлено новое напоминание");
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Превышено максильное количество символов в тексте напоминания");
+                        }
+
+                        this.Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Необходимо ввести дату напоминания");
+                    }
                 }
                 else
                 {
-                    string date = Convert.ToDateTime(DateOfReminder.Text).ToString("yyyy-MM-dd");
-                    var dbContext = new BaseDbContext();
-                    var unitOfWork = new UnitOfWork(dbContext);
-
-                    var user = unitOfWork.UserRepository.Entities
-                              .FirstOrDefault(n => n.Login == Login);
-
-
-                    string rtbText = new TextRange(ReminderRichTextBox.Document.ContentStart, ReminderRichTextBox.Document.ContentEnd).Text;
-
-                    var reminder = new Reminder()
-                    {
-                        Date = Convert.ToDateTime(date),
-                        Time = TimeTextBox.Text,
-                        Text = rtbText,
-                        Id_User = user.Id
-                    };
-
-                    unitOfWork.ReminderRepository.Add(reminder);
-                    unitOfWork.Commit();
-                    MessageBox.Show("Добавлено новое напоминание");
+                    MessageBox.Show("Необходимо указать время и текст напоминания!");
                 }
-                this.Close();
             }
             catch (Exception ex)
             {
@@ -92,10 +125,9 @@ namespace DIARY_V4
             this.Close();
         }
 
-        private bool IsReminderAlreadyExist(DateTime date)
+        private bool IsReminderAlreadyExist(DateTime? date)
         {
             bool flag = false;
-
             var dbContext = new BaseDbContext();
             var unitOfWork = new UnitOfWork(dbContext);
             var reminder = unitOfWork.ReminderRepository.Entities

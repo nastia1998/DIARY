@@ -35,16 +35,10 @@ namespace DIARY_V4
                 var user = unitOfWork.UserRepository.Entities
                     .FirstOrDefault (n => (n.Login == LoginTextBox.Text) && (n.Password == LoginFloatingPasswordBox.Password.ToString()));
 
-                if(user != null)
+                if (user != null)
                 {                    
                     MainWindow mainWindow = new MainWindow();
-                    //NearestEventsUC nearestEventsUC = new NearestEventsUC();
-                    //NotesUC notesUC = new NotesUC();
-
                     mainWindow.Login = LoginTextBox.Text;
-                    //nearestEventsUC.Login = LoginTextBox.Text;
-                    //notesUC.Login = LoginTextBox.Text;
-
                     mainWindow.Name = user.Name;
                     mainWindow.Show();
                     this.Close();

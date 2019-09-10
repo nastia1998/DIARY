@@ -3,7 +3,6 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -31,20 +30,6 @@ namespace DIARY_V4
         public string Login { get; set; }
         public int VRow { get; set; }
 
-        public byte[] imageToByteArray(System.Drawing.Image imageIn)
-        {
-            MemoryStream ms = new MemoryStream();
-            imageIn.Save(ms, System.Drawing.Imaging.ImageFormat.Gif);
-            return ms.ToArray();
-        }
-
-        public System.Drawing.Image byteArrayToImage(byte[] byteArrayIn)
-        {
-            MemoryStream ms = new MemoryStream(byteArrayIn);
-            System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);
-            return returnImage;
-        }
-
         BitmapImage image = new BitmapImage();
         private void ContactsWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -59,25 +44,68 @@ namespace DIARY_V4
 
                 NameTextBox.Text = contact.Name;
                 SurnameTextBox.Text = contact.Surname;
-                DateOfBirthDP.Text = contact.DateOfBirth.Value.ToShortDateString();
+                if (contact.DateOfBirth != null)
+                {
+                    DateOfBirthDP.Text = contact.DateOfBirth.Value.ToShortDateString();
+                }
                 CountryTextBox.Text = contact.Country;
                 CityTextBox.Text = contact.City;
                 PhoneTextBox.Text = contact.Telephone;
-                EmailTextBox.Text = contact.Email;                
-                //image = new BitmapImage(new Uri(contact.Photo));
-                Photo.Source = image;
+                EmailTextBox.Text = contact.Email;
+                try
+                {
+                    if (contact.Photo == "") //если фотографии нет
+                    {
+                        contact.Photo = "/Images/noimagefound.jpg";
+                        unitOfWork.Commit();
+                        Uri uri = new Uri(contact.Photo, UriKind.Relative);
+                        image = new BitmapImage(uri);
+                        Photo.Source = image;
+                    }
+                    else if (contact.Photo == "/Images/noimagefound.jpg")
+                    {
+                        try
+                        {
+                            Uri uri = new Uri(contact.Photo, UriKind.Relative);
+                            image = new BitmapImage(uri);
+                            Photo.Source = image;
+                        }
+                        catch(Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
+                    }
+                    else
+                    {
+                        image = new BitmapImage(new Uri(contact.Photo));
+                        Photo.Source = image;
+                    }
+                }
+                catch(System.IO.FileNotFoundException ex) 
+                {
+                    contact.Photo = "/Images/noimagefound.jpg";
+                    unitOfWork.Commit();
+                    BitmapImage bitmap = new BitmapImage(new Uri("/Images/noimagefound.jpg", UriKind.Relative));
+                    Photo.Source = bitmap;
+                }
+                
+            
             }
         }
 
         private void SaveContactbtn_Click(object sender, RoutedEventArgs e)
         {
-
             try
             {
-                string pattern = @"[a-zA-Z1-9\-\._]+@[a-z1-9]+(.[a-z1-9]+){1,}";
-                if (!Regex.IsMatch(EmailTextBox.Text, pattern))
+                string pattern1 = @"[a-zA-Z1-9\-\._]+@[a-z1-9]+(.[a-z1-9]+){1,}";
+                string pattern2 = @"^\d{11}$";
+                if (!Regex.IsMatch(EmailTextBox.Text, pattern1) && EmailTextBox.Text != "")
                 {
-                    MessageBox.Show("Неправильно");
+                    MessageBox.Show("Некорректный email");
+                }
+                else if(!Regex.IsMatch(PhoneTextBox.Text, pattern2) && PhoneTextBox.Text != "")
+                {
+                    MessageBox.Show("Некорретно введен номер телефона.\nПридерживайтесь шаблона.");
                 }
                 else
                 {
@@ -92,16 +120,37 @@ namespace DIARY_V4
 
                         contact.Name = NameTextBox.Text;
                         contact.Surname = SurnameTextBox.Text;
-                        contact.DateOfBirth = Convert.ToDateTime(DateOfBirthDP.Text);
+                        if (DateOfBirthDP.Text != "")
+                        {
+                            contact.DateOfBirth = Convert.ToDateTime(DateOfBirthDP.Text);
+                        }
                         contact.Country = CountryTextBox.Text;
                         contact.City = CityTextBox.Text;
                         contact.Telephone = PhoneTextBox.Text;
                         contact.Email = EmailTextBox.Text;
-                        //contact.Photo = image.UriSource.LocalPath;
-                        unitOfWork.Commit();
-                        MessageBox.Show("Изменения прошли успешно");
+                        if (contact.Photo != "/Images/noimagefound.jpg" && bitmap1 != null)
+                        {
+                            contact.Photo = bitmap1.UriSource.LocalPath;
+                            unitOfWork.Commit();
+                            MessageBox.Show("Изменения прошли успешно");
+                        }                        
+                        else if (imgLocation != "")
+                        {
+                            contact.Photo = imgLocation;
+                            unitOfWork.Commit();
+                            MessageBox.Show("Изменения прошли успешно");
+                        }
+                        else if (contact.Photo == "")
+                        {
+                            contact.Photo = "/Images/noimagefound.jpg";
+                            unitOfWork.Commit();
+                        }
+                        else
+                        {
+                            unitOfWork.Commit();
+                        }
                     }
-                    else
+                    else if (NameTextBox.Text != "" || SurnameTextBox.Text != "" || CountryTextBox.Text != "" || CityTextBox.Text != "" || PhoneTextBox.Text != "" || EmailTextBox.Text != "")
                     {
                         var dbContext = new BaseDbContext();
                         var unitOfWork = new UnitOfWork(dbContext);
@@ -109,36 +158,29 @@ namespace DIARY_V4
                         var user = unitOfWork.UserRepository.Entities
                                    .FirstOrDefault(n => n.Login == Login);
 
-                        //if (NameTextBox.Text == "" || SurnameTextBox.Text == "" || CountryTextBox.Text == "" || CityTextBox.Text == ""
-                        //    || PhoneTextBox.Text == "" || EmailTextBox.Text == "")
-                        //{
-                        //    MessageBox.Show("Одно из полей не заполнено. Вы желаете продолжить?", "Да", MessageBoxImage.)
-                        //}
-                        //var contact = new Contact()
-                        //{
-                        //    Name = NameTextBox.Text,
-                        //    Surname = SurnameTextBox.Text,
-                        //    DateOfBirth = Convert.ToDateTime(DateOfBirthDP.Text),
-                        //    Country = CountryTextBox.Text,
-                        //    City = CityTextBox.Text,
-                        //    Telephone = PhoneTextBox.Text,
-                        //    Email = EmailTextBox.Text,
-                        //    Id_User = user.Id,
-                        //    Photo = imgLocation
-                        //};
-
                         var contact = new Contact();
                         contact.Name = NameTextBox.Text;
                         contact.Surname = SurnameTextBox.Text;
-                        DateTime defaultDate = new DateTime();
-                        DateTime birth = DateOfBirthDP.Text == "" ? defaultDate : Convert.ToDateTime(DateOfBirthDP.Text);
-                        contact.DateOfBirth = birth;
+                   
+                        if(DateOfBirthDP.Text != "")
+                        {
+                            DateTime birth = Convert.ToDateTime(DateOfBirthDP.Text);
+                            contact.DateOfBirth = birth;
+                        }
+                        
                         contact.Country = CountryTextBox.Text;
                         contact.City = CityTextBox.Text;
                         contact.Telephone = PhoneTextBox.Text;
                         contact.Email = EmailTextBox.Text;
                         contact.Id_User = user.Id;
-                        //contact.Photo = imgLocation;
+                        if (imgLocation == "")
+                        {
+                            contact.Photo = "/Images/noimagefound.jpg";
+                        }
+                        else
+                        {
+                            contact.Photo = imgLocation;
+                        }                      
 
                         unitOfWork.ContactRepository.Add(contact);
                         unitOfWork.Commit();
@@ -153,7 +195,7 @@ namespace DIARY_V4
             }
         }
 
-        private void DltContactbtn_Click(object sender, RoutedEventArgs e)
+        private void CancelContactbtn_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
@@ -171,26 +213,7 @@ namespace DIARY_V4
             {
                 bitmap1 = new BitmapImage(new Uri(op.FileName));
                 Photo.Source = bitmap1;
-                //Photo.Source = new BitmapImage(new Uri(op.FileName));
                 imgLocation = op.FileName.ToString();
-            }
-        }
-
-        private void leftBtn_Click(object sender, RoutedEventArgs e)
-        {
-            if (bitmap1 != null)
-            {
-                bitmap1.Rotation = Rotation.Rotate180;
-                Photo.Source = bitmap1;
-            }
-        }
-
-        private void rightBtn_Click(object sender, RoutedEventArgs e)
-        {
-            if (bitmap1 != null)
-            {
-                bitmap1.Rotation = Rotation.Rotate90;
-                Photo.Source = bitmap1;
             }
         }
 
@@ -208,26 +231,29 @@ namespace DIARY_V4
             return flag;
         }
 
-        private void PhoneTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            //string pattern = @"[0-9]";
-            //if(Regex.IsMatch(PhoneTextBox.Text, pattern))
-            //{
-            //    MessageBox.Show("Правильно");
-            //}
-            //else
-            //{
-            //    MessageBox.Show("Неправильно");
-            //}
-        }
-
-        private void EmailTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            //string pattern = @"[a-zA-Z1-9\-\._]+@[a-z1-9]+(.[a-z1-9]+){1,}";
-            //if(!Regex.IsMatch(EmailTextBox.Text, pattern))
-            //{
-            //    MessageBox.Show("Неправильно");
-            //}
-        }
     }
 }
+
+
+
+
+
+
+
+
+//private BitmapImage fromByteToBitmap(Byte[] bytes)
+//{
+//    using (var ms = new System.IO.MemoryStream(bytes))
+//    {
+//        using (var imgg = System.Drawing.Image.FromStream(ms))
+//        {
+//            var s = new MemoryStream();
+//            imgg.Save(s, System.Drawing.Imaging.ImageFormat.Gif);
+//            var bi = new BitmapImage();
+//            bi.BeginInit();
+//            bi.StreamSource = s;
+//            bi.EndInit();
+//            return bi;
+//        }
+//    }
+//}

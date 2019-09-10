@@ -84,6 +84,14 @@
     <Compile Include="Migrations\201805201637057_Contact.Designer.cs">
       <DependentUpon>201805201637057_Contact.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201805210557160_Contact1.cs" />
+    <Compile Include="Migrations\201805210557160_Contact1.Designer.cs">
+      <DependentUpon>201805210557160_Contact1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201805210724173_Contact2.cs" />
+    <Compile Include="Migrations\201805210724173_Contact2.Designer.cs">
+      <DependentUpon>201805210724173_Contact2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Model\AttPhotos\AttPhoto.cs" />
     <Compile Include="Views\ContactsWindow.xaml.cs">
@@ -114,10 +122,6 @@
     <Compile Include="Views\UpdateNoteWindow.xaml.cs">
       <DependentUpon>UpdateNoteWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="Styles\DataGrids.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\ContactsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -199,12 +203,19 @@
     <EmbeddedResource Include="Migrations\201805201637057_Contact.resx">
       <DependentUpon>201805201637057_Contact.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201805210557160_Contact1.resx">
+      <DependentUpon>201805210557160_Contact1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201805210724173_Contact2.resx">
+      <DependentUpon>201805210724173_Contact2.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <Resource Include="Fonts\Packard-Modern.ttf" />
     <Resource Include="Fonts\Brusher.ttf" />
+    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -216,12 +227,17 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\Logo\notebook.ico" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\Logo\Colorful-Diary.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\Logo\Diary-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\noimagefound.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

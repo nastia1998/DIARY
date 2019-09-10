@@ -14,15 +14,9 @@ namespace DIARY_V4.Model
         public int Id_Contact { get; set; }
 
         public int Id_User { get; set; }
-        //public string Photo { get; set; }
-        public Byte[] Content { get; set; }
+        public string Photo { get; set; }
         public string Name { get; set; }
-        public string Surname { get; set; }
-
-        //[MaxLength(15)]
-        //public string DateOfBirth { get; set; }
-
-        
+        public string Surname { get; set; }        
         public DateTime? DateOfBirth { get; set; }
         public string Country { get; set; }
         public string City { get; set; }

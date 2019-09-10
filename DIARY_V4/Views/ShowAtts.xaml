@@ -7,11 +7,12 @@
         mc:Ignorable="d"
         Loaded="ShowAtts_Loaded"
         WindowStartupLocation="CenterScreen"
+        Icon="/Images/Logo/notebook.ico"
         Title="Вложенные фотографии" Height="370" Width="530">
     <Viewbox Stretch="Uniform">
         <Grid>
             <Button x:Name="Next"
-                    Content="Next"
+                    Content="Следующая"
                     HorizontalAlignment="Left"
                     Margin="174,288,0,5"
                     VerticalAlignment="Top"

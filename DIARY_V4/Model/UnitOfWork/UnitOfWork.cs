@@ -35,23 +35,5 @@ namespace DIARY_V4.Model
             _dbContext.Dispose();
         }
 
-        public void RejectChanges()
-        {
-            foreach (var entry in _dbContext.ChangeTracker.Entries()
-                  .Where(e => e.State != EntityState.Unchanged))
-            {
-                switch (entry.State)
-                {
-                    case EntityState.Added:
-                        entry.State = EntityState.Detached;
-                        break;
-                    case EntityState.Modified:
-                    case EntityState.Deleted:
-                        entry.Reload();
-                        break;
-                }
-            }
-        }      
-
     }
 }

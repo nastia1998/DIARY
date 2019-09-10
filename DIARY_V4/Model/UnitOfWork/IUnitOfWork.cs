@@ -19,11 +19,6 @@ namespace DIARY_V4.Model
         /// </summary>
         void Commit();
 
-        /// <summary>
-        /// Discards all changes tha has not been commited
-        /// </summary>
-        void RejectChanges();
-
         void Dispose();
     }
 }

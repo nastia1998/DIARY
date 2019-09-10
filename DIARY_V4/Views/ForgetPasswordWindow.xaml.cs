@@ -29,32 +29,39 @@ namespace DIARY_V4
         {
             try
             {
-                if(ForgetPasswordFloatingPasswordBox1.Password.ToString() == ForgetPasswordFloatingPasswordBox2.Password.ToString())
-                { 
-                    var dbContext = new BaseDbContext();
-                    var unitOfWork = new UnitOfWork(dbContext);
-
-                    var user = unitOfWork.UserRepository.Entities
-                        .FirstOrDefault(n => (n.Login == ForgetPasswordLoginTextBox.Text) && (n.SecretWord == ForgetPasswordSecretWordTextBox.Text));
-
-                    if(user != null)
+                if (ForgetPasswordLoginTextBox.Text != "" && ForgetPasswordFloatingPasswordBox1.Password != "" && ForgetPasswordSecretWordTextBox.Text != "")
+                {
+                    if (ForgetPasswordFloatingPasswordBox1.Password.ToString() == ForgetPasswordFloatingPasswordBox2.Password.ToString())
                     {
-                        user.Password = ForgetPasswordFloatingPasswordBox1.Password.ToString();
-                        unitOfWork.Commit();
-                        MessageBox.Show("Пароль обновлен успешно");
+                        var dbContext = new BaseDbContext();
+                        var unitOfWork = new UnitOfWork(dbContext);
 
-                        LoginWindow loginWindow = new LoginWindow();
-                        loginWindow.Show();
-                        this.Close();
+                        var user = unitOfWork.UserRepository.Entities
+                            .FirstOrDefault(n => (n.Login == ForgetPasswordLoginTextBox.Text) && (n.SecretWord == ForgetPasswordSecretWordTextBox.Text));
+
+                        if (user != null)
+                        {
+                            user.Password = ForgetPasswordFloatingPasswordBox1.Password.ToString();
+                            unitOfWork.Commit();
+                            MessageBox.Show("Пароль обновлен успешно");
+
+                            LoginWindow loginWindow = new LoginWindow();
+                            loginWindow.Show();
+                            this.Close();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Секретное слово или логин были введены неверно");
+                        }
                     }
                     else
                     {
-                        MessageBox.Show("Секретноеово или логин были введены неверно");
+                        MessageBox.Show("Поля паролей не совпадают");
                     }
                 }
                 else
                 {
-                    MessageBox.Show("Поля паролей не совпадают");
+                    MessageBox.Show("Все поля должны быть заполнены", "Пустые поля", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
 
             }

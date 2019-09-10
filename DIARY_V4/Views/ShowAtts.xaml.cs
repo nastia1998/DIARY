@@ -37,9 +37,10 @@ namespace DIARY_V4
 
         private void ShowAtts_Loaded(object sender, RoutedEventArgs e)
         {
+            cphotos = 0;
             var dbContext = new BaseDbContext();
-
             var unitOfWork = new UnitOfWork(dbContext);
+
             DateTime Date = Convert.ToDateTime(VRow);
 
             var note = unitOfWork.NoteRepository.Entities
@@ -55,38 +56,54 @@ namespace DIARY_V4
             }
 
             string[] parts = allPaths.Split(';');
-
-            if (parts[0] != "")
+            try
             {
-                bitmap1 = new BitmapImage(new Uri(parts[0]));
-                cphotos++;
-                MyImageControl0.Source = bitmap1;
-                Next.IsEnabled = false;
-                //Next.ToolTip = "У вас есть только одна фотография";
-            }
-            if (cphotos == 1)
-            {
-                if (parts[1] != "")
-                {
-                    bitmap2 = new BitmapImage(new Uri(parts[1]));
-                    cphotos++;
-                    MyImageControl1.Source = bitmap2;
-                    Next.IsEnabled = true;
+                if (parts[0] != "")
+                {               
+                     bitmap1 = new BitmapImage(new Uri(parts[0]));
+                     cphotos++;
+                     MyImageControl0.Source = bitmap1;
+                     Next.IsEnabled = false;
                 }
-            }
-            if (cphotos == 2)
-            {
-                if (parts[2] != "")
+                if (cphotos == 1)
                 {
-                    bitmap3 = new BitmapImage(new Uri(parts[2]));
-                    cphotos++;
-                    MyImageControl2.Source = bitmap3;
-                    Next.IsEnabled = true;
+                    if (parts[1] != "")
+                    {
+                        bitmap2 = new BitmapImage(new Uri(parts[1]));
+                        cphotos++;
+                        MyImageControl1.Source = bitmap2;
+                        Next.IsEnabled = true;
+                    }
                 }
-            }
+                if (cphotos == 2)
+                {
+                    if (parts[2] != "")
+                    {
+                        bitmap3 = new BitmapImage(new Uri(parts[2]));
+                        cphotos++;
+                        MyImageControl2.Source = bitmap3;
+                        Next.IsEnabled = true;
+                    }
+                }
 
-            else cphotos++;
-           
+                else
+                {
+                    if (cphotos > 1)
+                    {
+                        cphotos++;
+                        Next.IsEnabled = true;
+                    }
+                    else
+                    {
+                        Next.IsEnabled = false;
+                    }
+                }
+           }
+           catch (System.IO.FileNotFoundException)
+           {
+               MessageBox.Show("Некоторые фотографии не были найдены, поэтому доступ к вложениям отклонен", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+               this.Close();
+           }
         }
 
         bool a = true;
@@ -102,7 +119,7 @@ namespace DIARY_V4
         {          
             if(cphotos == 2)
             {
-                if(a)
+                if (a)
                 {
                     anim.To = 500;
                     a = false;
@@ -122,8 +139,7 @@ namespace DIARY_V4
                     anim.To = 500;
                     b = false;
                     c = true;
-                    transform.BeginAnimation(TranslateTransform.XProperty, anim);
-                    
+                    transform.BeginAnimation(TranslateTransform.XProperty, anim);                    
                 }
                 else if (!b && c)
                 {
@@ -131,14 +147,14 @@ namespace DIARY_V4
                     c = false;
                     transform.BeginAnimation(TranslateTransform.XProperty, anim);
                 }
-                else if(!b && !c)
+                else if (!b && !c)
                 {
                     anim.To = 500;
                     b = true;
                     c = true;
                     transform.BeginAnimation(TranslateTransform.XProperty, anim);
                 }
-                else if(b && c)
+                else if (b && c)
                 {
                     anim.To = 0;
                     b = true;
